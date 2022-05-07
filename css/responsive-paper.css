@@ -8,5 +8,5 @@ body {
 /* Scale canvas with resize attribute to full size */
 canvas[resize] {
     width: 100%;
-    height: auto;
+    height: 1000px;
 }

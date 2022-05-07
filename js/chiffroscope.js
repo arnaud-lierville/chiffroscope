@@ -1,3 +1,10 @@
+/* paper scene */
+var nbcolumn = 3
+var columnHeight = paper.view.bounds.height/6  // (fixed in css : 1000px/6)
+
+// when view is resized...
+paper.view.onResize = function() { drawApp(paper.view.bounds, nbcolumn) }
+
 /* html scene */
 var html =  '<nav class="navbar fixed-top navbar-light bg-light">' +
                 '<div class="container-fluid">' +
@@ -42,8 +49,14 @@ var numberButton = document.getElementById('numberButton')
 var numberInput = document.getElementById('numberInput')
 var showNumberSwitch = document.getElementById('showNumberSwitch')
 
-minusButton.onclick = function() { console.log('minusButton')}
-plusButton.onclick = function() { console.log('plusButton')}
+minusButton.onclick = function() {
+    nbcolumn--
+    drawApp(paper.view.bounds, nbcolumn)
+}
+plusButton.onclick = function() {
+    nbcolumn++
+    drawApp(paper.view.bounds, nbcolumn)
+}
 unityButton.onclick = function() { console.log('unityButton')}
 numberButton.onclick = function() { console.log('numberButton')}
 numberInput.addEventListener('keyup', function(event) {
@@ -56,3 +69,22 @@ showNumberSwitch.addEventListener('change', function() { console.log('showNumber
 
 //function keyup(event) { window.dispatchEvent(new Event('keyup')); }
 //function change(event) { window.dispatchEvent(new Event('change')); }
+
+function drawApp(parperSize, nbcolumn) {
+
+    project.clear()
+
+    var columnWitdh = parperSize.width/(nbcolumn +1)
+    for(var j=0; j<nbcolumn +1;j++) {
+        var from = new Point(columnWitdh/2 + columnWitdh*j, 0)
+        var to = new Point(columnWitdh/2 + columnWitdh*j, parperSize.height*1.5)
+        var path = new Path.Line(from, to)
+        path.strokeColor = '#91A8D0'
+        path.strokeWidth = 3
+    }
+    var from = new Point(0, columnHeight)
+    var to = new Point(parperSize.width, columnHeight)
+    var path = new Path.Line(from, to)
+    path.strokeColor = '#91A8D0'
+    path.strokeWidth = 3
+}
