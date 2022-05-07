@@ -1,11 +1,14 @@
-/* paper scene */
+/* Paper scene */
+// Global variables
 var nbcolumn = 3
 var columnHeight = paper.view.bounds.height/6  // (fixed in css : 1000px/6)
+var marginNavbar = 60
+var fontSize = 40
 
 // when view is resized...
 paper.view.onResize = function() { drawApp(paper.view.bounds, nbcolumn) }
 
-/* html scene */
+/* Html scene */
 var html =  '<nav class="navbar fixed-top navbar-light bg-light">' +
                 '<div class="container-fluid">' +
                     '<a class="navbar-brand" href="#">Chiffroscope</a>' +
@@ -40,8 +43,7 @@ var div = document.createElement('div')
 div.innerHTML = html
 document.body.insertBefore(div, document.body.firstChild);
 
-/* interaction html <-> canvas */
-
+/* Interaction html <-> canvas */
 var minusButton = document.getElementById('minusButton')
 var plusButton = document.getElementById('plusButton')
 var unityButton = document.getElementById('unityButton')
@@ -51,6 +53,7 @@ var showNumberSwitch = document.getElementById('showNumberSwitch')
 
 minusButton.onclick = function() {
     nbcolumn--
+    nbcolumn = Math.max(2, nbcolumn)
     drawApp(paper.view.bounds, nbcolumn)
 }
 plusButton.onclick = function() {
@@ -82,9 +85,51 @@ function drawApp(parperSize, nbcolumn) {
         path.strokeColor = '#91A8D0'
         path.strokeWidth = 3
     }
-    var from = new Point(0, columnHeight)
-    var to = new Point(parperSize.width, columnHeight)
+    var from = new Point(0, columnHeight + marginNavbar)
+    var to = new Point(parperSize.width, columnHeight + marginNavbar)
     var path = new Path.Line(from, to)
     path.strokeColor = '#91A8D0'
     path.strokeWidth = 3
+
+    // testing
+    new Card(50, 100, "Dizaines de milliers", columnWitdh)
+    new Card(250, 300, "1", columnWitdh)
+    new Card(550, 300, "unité", columnWitdh)
+    new Card(550, 500, "123", columnWitdh)
 }
+
+/* Card */
+var Card = Base.extend({
+
+    initialize: function(x, y, value, columnWitdh) {
+
+        var cardWidth = columnWitdh*0.7
+        var cardHeight = columnHeight*0.7
+        
+        this.path = new Path.Rectangle({
+            topLeft: [x, y],
+               bottomRight: [x + cardWidth, y + cardHeight],
+               radius: 10,
+               strokeColor: 'black',
+               fillColor: 'white'
+           })
+
+        this.text = new PointText(new Point(x + cardWidth/2,y + cardHeight/1.6));
+        this.text.justification = 'center';
+        this.text.fillColor = 'black';
+        this.text.fontSize = fontSize
+        this.text.content = value
+
+        //scaling the text if too long
+        var textWidth = this.text.bounds.width
+        var textNumberOfCharacters = value.toString().length
+        if(textNumberOfCharacters > cardWidth/(fontSize*0.75)) { this.text.scale(cardWidth*0.9/textWidth) }
+
+        this.cardGroup = new Group();
+        this.cardGroup.addChild(this.path)
+        this.cardGroup.addChild(this.text)
+        this.cardGroup.bringToFront()
+
+        return this.cardGroup
+    }})
+

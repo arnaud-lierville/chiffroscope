@@ -2,6 +2,12 @@ fix:
 
 tooltips / popover
 
+css/js :
+disable plus/minus if bornes atteintes
+
+
+feat: fit text to largeur card
+
 
 warning:
 
