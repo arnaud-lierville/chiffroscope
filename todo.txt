@@ -13,3 +13,12 @@ warning:
 
 responsive-paper.css :
     canvas[resize] ?> height: 1000px; (normaly auto)
+
+
+    TODO :
+
+    remove
+    calcul colonne
+    random
+    calcul
+    tooltips

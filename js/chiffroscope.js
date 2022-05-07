@@ -5,6 +5,13 @@ var columnHeight = paper.view.bounds.height/6  // (fixed in css : 1000px/6)
 var marginNavbar = 60
 var fontSize = 40
 
+var gridColor = '#91A8D0'
+var pinkColorCard = '#F0DEE4'
+var pinkStrokeColor = '#D8A9B9'
+var greenColorCard = '#DCECD3'
+var greenStrokeColor = '#88BE69'
+var strokeWidth = 3
+
 // when view is resized...
 paper.view.onResize = function() { drawApp(paper.view.bounds, nbcolumn) }
 
@@ -82,14 +89,14 @@ function drawApp(parperSize, nbcolumn) {
         var from = new Point(columnWitdh/2 + columnWitdh*j, 0)
         var to = new Point(columnWitdh/2 + columnWitdh*j, parperSize.height*1.5)
         var path = new Path.Line(from, to)
-        path.strokeColor = '#91A8D0'
-        path.strokeWidth = 3
+        path.strokeColor = gridColor
+        path.strokeWidth = strokeWidth
     }
     var from = new Point(0, columnHeight + marginNavbar)
     var to = new Point(parperSize.width, columnHeight + marginNavbar)
     var path = new Path.Line(from, to)
-    path.strokeColor = '#91A8D0'
-    path.strokeWidth = 3
+    path.strokeColor = gridColor
+    path.strokeWidth = strokeWidth
 
     // testing
     new Card(50, 100, "Dizaines de milliers", columnWitdh)
@@ -105,13 +112,21 @@ var Card = Base.extend({
 
         var cardWidth = columnWitdh*0.7
         var cardHeight = columnHeight*0.7
+        this.value = value
+        this.fillColor = pinkColorCard
+        this.strokeColor = pinkStrokeColor
+        if(isNaN(value)) { 
+            this.fillColor = greenColorCard
+            this.strokeColor = greenStrokeColor
+         }
         
         this.path = new Path.Rectangle({
             topLeft: [x, y],
                bottomRight: [x + cardWidth, y + cardHeight],
                radius: 10,
-               strokeColor: 'black',
-               fillColor: 'white'
+               strokeWidth: strokeWidth,
+               fillColor: this.fillColor,
+               strokeColor: this.strokeColor
            })
 
         this.text = new PointText(new Point(x + cardWidth/2,y + cardHeight/1.6));
@@ -123,13 +138,44 @@ var Card = Base.extend({
         //scaling the text if too long
         var textWidth = this.text.bounds.width
         var textNumberOfCharacters = value.toString().length
-        if(textNumberOfCharacters > cardWidth/(fontSize*0.75)) { this.text.scale(cardWidth*0.9/textWidth) }
+        this.scale = 1
+        if(textNumberOfCharacters > cardWidth/(fontSize*0.69)) { this.scale = cardWidth*0.9/textWidth }
+        this.text.scale(this.scale)
 
         this.cardGroup = new Group();
         this.cardGroup.addChild(this.path)
         this.cardGroup.addChild(this.text)
         this.cardGroup.bringToFront()
 
+        var that = this
+        var wasMoving = false
+
+        this.cardGroup.onMouseDown = function(event) {
+            that.cardGroup.bringToFront()
+            wasMoving = false
+        }
+
+        this.cardGroup.onMouseUp = function(event) {
+            if(!wasMoving) { 
+                if (that.text.content == '?') { 
+                    that.text.content = value
+                    that.text.scale(that.scale)
+                 } else { 
+                     that.text.content = '?'
+                     that.text.scale(1/that.scale)
+                    }
+             }
+             that.cardGroup.shadowColor = null;
+        }
+
+        this.cardGroup.onMouseDrag = function(event) { 
+            that.cardGroup.shadowColor = new Color(0, 0, 0);
+            that.cardGroup.shadowBlur = 12;
+            that.cardGroup.shadowOffset = new Point(5, 5);
+            that.cardGroup.bringToFront()
+            that.cardGroup.position += event.delta;
+            wasMoving = true
+        }
+
         return this.cardGroup
     }})
-
