@@ -11,6 +11,55 @@ var pinkStrokeColor = '#D8A9B9'
 var greenColorCard = '#DCECD3'
 var greenStrokeColor = '#88BE69'
 var strokeWidth = 3
+var unities = {
+    '-3': 'Millièmes',
+    '-2': 'Centièmes',
+    '-1': 'Dixièmes',
+    '0': 'Unités',
+    '1': 'Dizaines',
+    '2': 'Centaines',
+    '3': 'Milliers',
+    '4': 'Dizaines de milliers',
+    '5': 'Centaines de milliers',
+    '6': 'Millions'
+}
+
+var shortCut = {
+    'm*': unities['-3'],
+    'c*': unities['-2'],
+    'd*': unities['-1'],
+    'u': unities['0'],
+    'd': unities['1'],
+    'c': unities['2'],
+    'm': unities['3'],
+    'dm': unities['4'],
+    'cm': unities['5'],
+    'M': unities['6'],
+}
+
+/* Utils */
+
+getRandomPosition = function() {
+        //random position
+        var parperSize = paper.view.bounds
+        var x = parperSize.width/2 + (Math.floor(Math.random()*7) - 3)*parperSize.width/(3*(nbcolumn +1))
+        var y = parperSize.height/3 + (Math.floor(Math.random()*7) - 3)*3*parperSize.height/(columnHeight)
+        return { 'x': x, 'y':y }
+}
+function generateCard(isUnity) {
+
+    var parperSize = paper.view.bounds
+    var randomPosition = getRandomPosition()
+    var columnWitdh = parperSize.width/(nbcolumn +1)
+    if(isUnity) {
+        var order = Math.floor(Math.random()*(7) - 3 ) // unityLevel.value = 3
+        if(unityLevel.value == 2) { order = Math.floor(Math.random() * 7) }
+        if(unityLevel.value == 1) { order = Math.floor(Math.random() * 4) }
+        new Card(randomPosition.x, randomPosition.y, unities[order.toString()], columnWitdh)
+    } else {
+        new Card(randomPosition.x, randomPosition.y, Math.floor(Math.random()*(Math.pow(10, level.value))), columnWitdh)
+    }
+}
 
 // when view is resized...
 paper.view.onResize = function() { drawApp(paper.view.bounds, nbcolumn) }
@@ -18,7 +67,7 @@ paper.view.onResize = function() { drawApp(paper.view.bounds, nbcolumn) }
 /* Html scene */
 var html =  '<nav class="navbar fixed-top navbar-light bg-light">' +
                 '<div class="container-fluid">' +
-                    '<a class="navbar-brand" href="#">Chiffroscope</a>' +
+                    '<a class="navbar-brand" href="https://chiffroscope.blogs.laclasse.com" target="_blank">Chiffroscope</a>' +
 
                     '<div class="btn-group">' +
                         '<button class="btn btn-outline-info" data-toggle="tooltip" data-placement="bottom" title="Moins de colonnes" id="minusButton">' +
@@ -36,7 +85,23 @@ var html =  '<nav class="navbar fixed-top navbar-light bg-light">' +
                     '</div>' +
 
                     '<div class="d-flex">' +
+                        '<select class="form-select" id="unityLevel">' +
+                            '<option value="1" selected>Jusqu\'au milliers</option>' +
+                            '<option value="2">Jusqu\'au millions</option>' +
+                            '<option value="3">Décimaux</option>' +
+                            '</select>' +
+                    '</div>' +
+
+                    '<div class="d-flex">' +
                         '<input id="numberInput" class="form-control me-2" type="search" data-toggle="tooltip" data-placement="left" title="Entrez un nombre ou une unité de numération (u, 10u, 1000u)" >' +
+                    '</div>' +
+
+                    '<div class="d-flex">' +
+                        '<select class="form-select" id="level">' +
+                            '<option value="1" selected>Jusqu\'à 9</option>' +
+                            '<option value="2">Jusqu\'à 99</option>' +
+                            '<option value="3">Jusqu\'à 999</option>' +
+                            '</select>' +
                     '</div>' +
                     
                     '<div class="form-check form-switch">' +
@@ -56,6 +121,7 @@ var plusButton = document.getElementById('plusButton')
 var unityButton = document.getElementById('unityButton')
 var numberButton = document.getElementById('numberButton')
 var numberInput = document.getElementById('numberInput')
+var level = document.getElementById('level')
 var showNumberSwitch = document.getElementById('showNumberSwitch')
 
 minusButton.onclick = function() {
@@ -67,15 +133,29 @@ plusButton.onclick = function() {
     nbcolumn++
     drawApp(paper.view.bounds, nbcolumn)
 }
-unityButton.onclick = function() { console.log('unityButton')}
-numberButton.onclick = function() { console.log('numberButton')}
+unityButton.onclick = function() { generateCard(true) }
+numberButton.onclick = function() { generateCard(false) }
 numberInput.addEventListener('keyup', function(event) {
-    if(event.key == 'Enter') {
-        console.log(numberInput.value)
-        numberInput.value = ''
+    if(event.key == 'Enter') {        
+        var randomPosition = getRandomPosition()
+        var columnWitdh = paper.view.bounds.width/(nbcolumn +1)
+        var currentValue = numberInput.value
+        var generate = false
+
+        if(currentValue in shortCut) { 
+            currentValue = shortCut[currentValue]
+            generate = true
+         } else {
+             if(!isNaN(currentValue)) {
+                 generate = true
+             }
+         }
+         if(generate) { new Card(randomPosition.x, randomPosition.y, currentValue, columnWitdh) }
+         numberInput.value = ''
     }
 })
 showNumberSwitch.addEventListener('change', function() { console.log('showNumberSwitch') })
+level.addEventListener('change', function() { console.log(level.value) })
 
 //function keyup(event) { window.dispatchEvent(new Event('keyup')); }
 //function change(event) { window.dispatchEvent(new Event('change')); }
@@ -97,12 +177,6 @@ function drawApp(parperSize, nbcolumn) {
     var path = new Path.Line(from, to)
     path.strokeColor = gridColor
     path.strokeWidth = strokeWidth
-
-    // testing
-    new Card(50, 100, "Dizaines de milliers", columnWitdh)
-    new Card(250, 300, "1", columnWitdh)
-    new Card(550, 300, "unité", columnWitdh)
-    new Card(550, 500, "123", columnWitdh)
 }
 
 /* Card */
@@ -175,6 +249,10 @@ var Card = Base.extend({
             that.cardGroup.bringToFront()
             that.cardGroup.position += event.delta;
             wasMoving = true
+        }
+
+        this.cardGroup.onDoubleClick = function(event) {
+            that.cardGroup.remove()
         }
 
         return this.cardGroup

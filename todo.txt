@@ -17,8 +17,12 @@ responsive-paper.css :
 
     TODO :
 
-    remove
+    remove DONE : double-click !!!
     calcul colonne
-    random
-    calcul
+    calcul total
     tooltips
+    switch => password & ?(hide)
+
+
+online
+
