@@ -1,44 +1,14 @@
-fix:
+TODO :
+console.log
+confusion 2 switch (changer de couleur)
+fix : tooltips bootstrap
+push online
 
-tooltips / popover
-
-
-warning:
-
-responsive-paper.css :
-    canvas[resize] ?> height: 1000px; (normaly auto)
-
-
- TODO :
-
-    
-    shorcut : 
-
-    console.log
-
-    pas AIE ! si pas nombre
-
-    confusion 2 switch
-    
-    tooltips
-    favicon
-
-    
-    push online
-
-
-HELP :
-    double-click
-    click
-
-DONE :
- remove DONE : double-click !!!
- CLEAR ALL
- blockmoveTOP
- switch => password & ?(hide)
- 13,56 au lieu de 12.67 & erreur arrondi
- trigger Enter Key when NOT focus on input
-
-NOT :
+TODO+ :
 random card : pas deux fois la même unité
 12,24 ou 12.24 in input
+pas AIE ! si pas nombre
+shorcuts p plus de colonnes, m moins de colonnes, u génération d'une carte unité, n génération d'une carte nombre
+
+WARNING :
+responsive-paper.css : canvas[resize] ?> height: 1000px; (normaly auto)

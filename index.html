@@ -12,18 +12,77 @@
 	<body>
 
 		<div class="modal" tabindex="-1" id="helpModal">
-			<div class="modal-dialog">
+			<div class="modal-dialog modal-xl">
 				<div class="modal-content">
 					<div class="modal-header">
-				  	<h5 class="modal-title">Modal title</h5>
+				  	<h3 class="modal-title text-center">Chiffroscope - mode d'emploi</h3>
 				  	<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">
-				  		<p>Modal body text goes here.</p>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-primary">Save changes</button>
+						<div class="row">
+							<div class="col">
+								<div style="margin: 5px">
+									<button class="btn btn-outline-info" style="margin-right: 10px">
+										<i class="fa-solid fa-minus"></i> 
+									</button>Moins de colonnes
+								</div>
+								<div style="margin: 5px">
+									<button class="btn btn-outline-success" style="margin-right: 10px">
+										<i class="fa-solid fa-coins"></i> 
+									</button>Générer une carte unité au hasard
+								</div>
+								<div style="margin: 5px">
+									<button class="btn btn-outline-success" style="margin-right: 10px">
+										<i class="fa-solid fa-hand-sparkles"></i> 
+									</button>Générer une carte nombre au hasard
+								</div>
+								<div style="margin: 5px">
+									<button class="btn btn-outline-danger" style="margin-right: 10px">
+										<i class="fa-solid fa-plus"></i> 
+									</button>Plus de colonnes
+								</div>
+								<p></p>
+								<p>Un <strong>CLICK</strong> sur une carte la retourne.</p>
+								<p>Un <strong>DOUBLE-CLICK</strong> sur une carte la supprime.</p>
+							</div>
+							<div class="col">
+								<p>Les deux menus déroulants permettent de régler le tirage aléatoire des cartes.</p>
+								<p>Le premier switch permet de cacher la valeur de la carte à génerer.</p>
+								<p>Le deuxième switch permet d'afficher le nombre codé.</p>
+
+								<p></p>
+								<div style="margin: 5px">
+									<button class="btn btn-danger" style="margin-right: 10px">
+										<i class="fa-solid fa-trash"></i> 
+									</button>Pour recommencer
+								</div>
+								<div style="margin: 5px">
+									<button class="btn btn-success" style="margin-right: 10px">
+										<i class="fa-solid fa-question"></i> 
+									</button>Accès à cette aide !
+								</div>
+							</div>
+							<div class="col">
+								<h5>Cartes unités possibles :</h5>
+								<ul>
+									<li>Millièmes (saisie 'm*')</li>
+									<li>Centièmes (saisie 'c*')</li>
+									<li>Dixièmes (saisie 'd*')</li>
+									<li>Unités (saisie 'u')</li>
+									<li>Dizaines (saisie 'd')</li>
+									<li>Centaines (saisie 'c')</li>
+									<li>Milliers (saisie 'm')</li>
+									<li>Dizaines de milliers (saisie 'dm')</li>
+									<li>Centaines de milliers (saisie 'cm')</li>
+									<li>Millions (saisie 'M')</li>
+								</ul>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col">
+								<a href="https://chiffroscope.blogs.laclasse.com/" target="_blank">Accès à la ressource pédagogiaue sur le site de l'Ifé</a>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
