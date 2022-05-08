@@ -14,18 +14,26 @@ responsive-paper.css :
 
     TODO :
 
-    CLEAR ALL
+    trig enter NOT focus on input number
+    shorcut : 
+
+
    
     calcul colonne
     calcul total
-    blockmoveTOP
+    
     tooltips
+
     switch => password & ?(hide)
 
 
 push online
 
 
-HELP
+HELP :
+    double-click
+    click
 DONE :
  remove DONE : double-click !!!
+ CLEAR ALL
+ blockmoveTOP

@@ -4,6 +4,7 @@ var nbcolumn = 3
 var columnHeight = paper.view.bounds.height/6  // (fixed in css : 1000px/6)
 var marginNavbar = 60
 var fontSize = 40
+var isNumberHidden = false
 
 var gridColor = '#91A8D0'
 var pinkColorCard = '#F0DEE4'
@@ -70,8 +71,10 @@ function redrawFromStack(delta) {
         var scale = 1
         if(delta == 1) { scale = nbcolumn/(nbcolumn + 1) }
         if(delta == -1) { scale = (nbcolumn + 2)/(nbcolumn + 1) }
-        new Card(data.x*scale, data.y, data.value, paper.view.bounds.width/(nbcolumn + 1))
-        delete(cardStack[cardID])
+        if(cardStack[cardID]['pos'] <= nbcolumn + 1) {
+            new Card(data.x*scale, data.y, data.value, paper.view.bounds.width/(nbcolumn + 1))
+        }
+        delete(cardStack[cardID])   
     }
 }
 
@@ -109,20 +112,31 @@ var html =  '<nav class="navbar fixed-top navbar-light bg-light">' +
                     '</div>' +
 
                     '<div class="d-flex">' +
-                        '<input id="numberInput" class="form-control me-2" type="search" data-toggle="tooltip" data-placement="left" title="Entrez un nombre ou une unité de numération (u, 10u, 1000u)" >' +
-                    '</div>' +
-
-                    '<div class="d-flex">' +
                         '<select class="form-select" id="level">' +
                             '<option value="1" selected>Jusqu\'à 9</option>' +
                             '<option value="2">Jusqu\'à 99</option>' +
                             '<option value="3">Jusqu\'à 999</option>' +
                             '</select>' +
                     '</div>' +
-                    
+
                     '<div class="form-check form-switch">' +
-                        '<input id="showNumberSwitch" class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckCheckedDisabled" style="transform: scale(1.8);" >' +
-                        '<label class="form-check-label" for="flexSwitchCheckCheckedDisabled" style="padding-left: 10px;">Voir la réponse</label>' +
+                        '<input id="showNumberSwitch" class="form-check-input" type="checkbox" role="switch" style="transform: scale(1.8);" >' +
+                        '<label class="form-check-label" style="padding-left: 10px;">Cacher/Montrer</label>' +
+                    '</div>' +
+
+                    '<div class="d-flex">' +
+                        '<input id="numberInput" class="form-control me-2" type="search" data-toggle="tooltip" data-placement="left" title="Entrez un nombre ou une unité de numération (u, c, *d)" >' +
+                    '</div>' +
+
+                    '<div class="form-check form-switch">' +
+                        '<input id="showResultSwitch" class="form-check-input" type="checkbox" role="switch" style="transform: scale(1.8);" >' +
+                        '<label class="form-check-label" style="padding-left: 10px;">Voir la réponse</label>' +
+                    '</div>' +
+
+                    '<div class="d-flex">' +
+                        '<button class="btn btn-danger" data-toggle="tooltip" data-placement="bottom" title="Tout éffacer" id="trashButton">' +
+                            '<i class="fa-solid fa-trash"></i>' +
+                        '</button>' +
                     '</div>' +
                 '</div>' +
             '</nav>'
@@ -139,6 +153,8 @@ var numberButton = document.getElementById('numberButton')
 var numberInput = document.getElementById('numberInput')
 var level = document.getElementById('level')
 var showNumberSwitch = document.getElementById('showNumberSwitch')
+var showResultSwitch = document.getElementById('showResultSwitch')
+var trashButton = document.getElementById('trashButton')
 
 minusButton.onclick = function() {
     nbcolumn--
@@ -173,7 +189,17 @@ numberInput.addEventListener('keyup', function(event) {
          numberInput.value = ''
     }
 })
-showNumberSwitch.addEventListener('change', function() { console.log('showNumberSwitch') })
+showResultSwitch.addEventListener('change', function() { console.log('showResultSwitch') })
+showNumberSwitch.addEventListener('change', function() { 
+    if(!isNumberHidden) { numberInput.setAttribute("type", "password") } else { numberInput.setAttribute("type", "text") }
+    isNumberHidden = !isNumberHidden
+ })
+
+trashButton.onclick = function() {
+    nbcolumn = 3
+    cardStack  = {}
+    drawApp(paper.view.bounds, nbcolumn, 0)
+}
 
 //level.addEventListener('change', function() { console.log(level.value) })
 //function keyup(event) { window.dispatchEvent(new Event('keyup')); }
@@ -182,8 +208,8 @@ showNumberSwitch.addEventListener('change', function() { console.log('showNumber
 function drawApp(parperSize, nbcolumn, way) {
 
     project.clear()
-    redrawFromStack(way)
-
+    var grid = new Group()
+    
     var columnWitdh = parperSize.width/(nbcolumn + 1)
     for(var j=0; j<nbcolumn +1;j++) {
         var from = new Point(columnWitdh/2 + columnWitdh*j, 0)
@@ -191,12 +217,18 @@ function drawApp(parperSize, nbcolumn, way) {
         var path = new Path.Line(from, to)
         path.strokeColor = gridColor
         path.strokeWidth = strokeWidth
+        grid.addChild(path)
     }
     var from = new Point(0, columnHeight + marginNavbar)
     var to = new Point(parperSize.width, columnHeight + marginNavbar)
     var path = new Path.Line(from, to)
     path.strokeColor = gridColor
     path.strokeWidth = strokeWidth
+    grid.addChild(path)
+    grid.sendToBack()
+    grid.visible = true
+
+    redrawFromStack(way)
 }
 
 /* Card */
@@ -212,9 +244,11 @@ var Card = Base.extend({
         this.value = value
         this.fillColor = pinkColorCard
         this.strokeColor = pinkStrokeColor
+        this.isNumber = true
         if(isNaN(value)) { 
             this.fillColor = greenColorCard
             this.strokeColor = greenStrokeColor
+            this.isNumber = false
          }
         
         this.path = new Path.Rectangle({
@@ -231,14 +265,15 @@ var Card = Base.extend({
         this.text.fillColor = 'black';
         this.text.fontSize = fontSize
         this.text.content = value
-
+        
         //scaling the text if too long
         var textWidth = this.text.bounds.width
+        if(isNumberHidden) { this.text.content = '?' }
         var textNumberOfCharacters = value.toString().length
         this.scale = 1
         if(textNumberOfCharacters > cardWidth/(fontSize*0.69)) { this.scale = cardWidth*0.9/textWidth }
-        this.text.scale(this.scale)
-
+        if(!isNumberHidden) { this.text.scale(this.scale) }
+    
         this.cardGroup = new Group();
         this.cardGroup.addChild(this.path)
         this.cardGroup.addChild(this.text)
@@ -248,7 +283,9 @@ var Card = Base.extend({
         cardStack[this.cardID] = {
             'x': x,
             'y': y,
-            'value': value
+            'value': value,
+            'pos': Math.floor((x - cardWidth/5)/columnWitdh) + 1,
+            'isNumber': this.isNumber
         }
 
         /* methods */
@@ -279,9 +316,14 @@ var Card = Base.extend({
             that.cardGroup.shadowBlur = 12;
             that.cardGroup.shadowOffset = new Point(5, 5);
             that.cardGroup.bringToFront()
-            that.cardGroup.position += event.delta;
+            
+            that.cardGroup.position.x += event.delta.x;
+            that.cardGroup.position.y += event.delta.y;
+            that.cardGroup.position.y = Math.max(that.cardGroup.position.y, marginNavbar + cardHeight/2)
+
             cardStack[that.cardID]['x'] = cardStack[that.cardID]['x'] + event.delta.x
-            cardStack[that.cardID]['y'] = cardStack[that.cardID]['y'] + event.delta.y
+            cardStack[that.cardID]['y'] = Math.max(cardStack[that.cardID]['y'] + event.delta.y, marginNavbar)
+            cardStack[that.cardID]['pos'] = Math.floor((cardStack[that.cardID]['x'] - cardWidth/5)/columnWitdh) + 1
             wasMoving = true
         }
 
