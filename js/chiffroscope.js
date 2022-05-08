@@ -11,6 +11,9 @@ var pinkStrokeColor = '#D8A9B9'
 var greenColorCard = '#DCECD3'
 var greenStrokeColor = '#88BE69'
 var strokeWidth = 3
+
+var cardStack  = {}
+
 var unities = {
     '-3': 'Millièmes',
     '-2': 'Centièmes',
@@ -42,7 +45,7 @@ var shortCut = {
 getRandomPosition = function() {
         //random position
         var parperSize = paper.view.bounds
-        var x = parperSize.width/2 + (Math.floor(Math.random()*7) - 3)*parperSize.width/(3*(nbcolumn +1))
+        var x = parperSize.width/2 + (Math.floor(Math.random()*7) - 3)*parperSize.width/(3*(nbcolumn + 1))
         var y = parperSize.height/3 + (Math.floor(Math.random()*7) - 3)*3*parperSize.height/(columnHeight)
         return { 'x': x, 'y':y }
 }
@@ -61,8 +64,21 @@ function generateCard(isUnity) {
     }
 }
 
+function redrawFromStack(delta) {
+    for(var cardID in cardStack ) {
+        var data = cardStack[cardID]
+        var scale = 1
+        if(delta == 1) { scale = nbcolumn/(nbcolumn + 1) }
+        if(delta == -1) { scale = (nbcolumn + 2)/(nbcolumn + 1) }
+        new Card(data.x*scale, data.y, data.value, paper.view.bounds.width/(nbcolumn + 1))
+        delete(cardStack[cardID])
+    }
+}
+
+function ID() { return Math.random().toString(36).substring(2, 9); }
+
 // when view is resized...
-paper.view.onResize = function() { drawApp(paper.view.bounds, nbcolumn) }
+paper.view.onResize = function() { drawApp(paper.view.bounds, nbcolumn, 0) }
 
 /* Html scene */
 var html =  '<nav class="navbar fixed-top navbar-light bg-light">' +
@@ -126,12 +142,15 @@ var showNumberSwitch = document.getElementById('showNumberSwitch')
 
 minusButton.onclick = function() {
     nbcolumn--
-    nbcolumn = Math.max(2, nbcolumn)
-    drawApp(paper.view.bounds, nbcolumn)
+    if(nbcolumn > 1) { 
+        drawApp(paper.view.bounds, nbcolumn, -1)
+    } else {
+        nbcolumn = 2
+    }
 }
 plusButton.onclick = function() {
     nbcolumn++
-    drawApp(paper.view.bounds, nbcolumn)
+    drawApp(paper.view.bounds, nbcolumn, 1)
 }
 unityButton.onclick = function() { generateCard(true) }
 numberButton.onclick = function() { generateCard(false) }
@@ -155,16 +174,17 @@ numberInput.addEventListener('keyup', function(event) {
     }
 })
 showNumberSwitch.addEventListener('change', function() { console.log('showNumberSwitch') })
-level.addEventListener('change', function() { console.log(level.value) })
 
+//level.addEventListener('change', function() { console.log(level.value) })
 //function keyup(event) { window.dispatchEvent(new Event('keyup')); }
 //function change(event) { window.dispatchEvent(new Event('change')); }
 
-function drawApp(parperSize, nbcolumn) {
+function drawApp(parperSize, nbcolumn, way) {
 
     project.clear()
+    redrawFromStack(way)
 
-    var columnWitdh = parperSize.width/(nbcolumn +1)
+    var columnWitdh = parperSize.width/(nbcolumn + 1)
     for(var j=0; j<nbcolumn +1;j++) {
         var from = new Point(columnWitdh/2 + columnWitdh*j, 0)
         var to = new Point(columnWitdh/2 + columnWitdh*j, parperSize.height*1.5)
@@ -186,6 +206,9 @@ var Card = Base.extend({
 
         var cardWidth = columnWitdh*0.7
         var cardHeight = columnHeight*0.7
+        
+        this.x = x
+        this.y = y
         this.value = value
         this.fillColor = pinkColorCard
         this.strokeColor = pinkStrokeColor
@@ -221,6 +244,15 @@ var Card = Base.extend({
         this.cardGroup.addChild(this.text)
         this.cardGroup.bringToFront()
 
+        this.cardID = ID()
+        cardStack[this.cardID] = {
+            'x': x,
+            'y': y,
+            'value': value
+        }
+
+        /* methods */
+
         var that = this
         var wasMoving = false
 
@@ -248,10 +280,14 @@ var Card = Base.extend({
             that.cardGroup.shadowOffset = new Point(5, 5);
             that.cardGroup.bringToFront()
             that.cardGroup.position += event.delta;
+            cardStack[that.cardID]['x'] = cardStack[that.cardID]['x'] + event.delta.x
+            cardStack[that.cardID]['y'] = cardStack[that.cardID]['y'] + event.delta.y
             wasMoving = true
         }
 
         this.cardGroup.onDoubleClick = function(event) {
+            delete(cardStack[that.cardID])
+            console.log(cardStack)
             that.cardGroup.remove()
         }
 

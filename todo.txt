@@ -6,9 +6,6 @@ css/js :
 disable plus/minus if bornes atteintes
 
 
-feat: fit text to largeur card
-
-
 warning:
 
 responsive-paper.css :
@@ -17,12 +14,18 @@ responsive-paper.css :
 
     TODO :
 
-    remove DONE : double-click !!!
+    CLEAR ALL
+   
     calcul colonne
     calcul total
+    blockmoveTOP
     tooltips
     switch => password & ?(hide)
 
 
-online
+push online
 
+
+HELP
+DONE :
+ remove DONE : double-click !!!
