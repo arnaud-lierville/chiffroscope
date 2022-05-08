@@ -2,6 +2,8 @@ fix:
 
 tooltips / popover
 
+
+
 css/js :
 disable plus/minus if bornes atteintes
 
@@ -12,28 +14,34 @@ responsive-paper.css :
     canvas[resize] ?> height: 1000px; (normaly auto)
 
 
-    TODO :
+ TODO :
 
     trig enter NOT focus on input number
     shorcut : 
 
+    console.log
 
-   
-    calcul colonne
-    calcul total
+    pas AIE ! si pas nombre
+
+    confusion 2 switch
     
     tooltips
+    favicon
 
-    switch => password & ?(hide)
-
-
-push online
+    
+    push online
 
 
 HELP :
     double-click
     click
+
 DONE :
  remove DONE : double-click !!!
  CLEAR ALL
  blockmoveTOP
+ switch => password & ?(hide)
+ 13,56 au lieu de 12.67 & erreur arrondi
+
+NOT :
+random card : pas deux fois la même unité

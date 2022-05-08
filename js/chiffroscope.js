@@ -2,9 +2,10 @@
 // Global variables
 var nbcolumn = 3
 var columnHeight = paper.view.bounds.height/6  // (fixed in css : 1000px/6)
-var marginNavbar = 60
+var marginNavbar = 80
 var fontSize = 40
 var isNumberHidden = false
+var isResultHidden = true
 
 var gridColor = '#91A8D0'
 var pinkColorCard = '#F0DEE4'
@@ -41,6 +42,19 @@ var shortCut = {
     'M': unities['6'],
 }
 
+var shortCutToOrder = {
+    'm*': '-3',
+    'c*': '-2',
+    'd*': '-1',
+    'u': '0',
+    'd': '1',
+    'c': '2',
+    'm': '3',
+    'dm': '4',
+    'cm': '5',
+    'M': '6',
+}
+
 /* Utils */
 
 getRandomPosition = function() {
@@ -50,8 +64,8 @@ getRandomPosition = function() {
         var y = parperSize.height/3 + (Math.floor(Math.random()*7) - 3)*3*parperSize.height/(columnHeight)
         return { 'x': x, 'y':y }
 }
-function generateCard(isUnity) {
 
+function generateCard(isUnity) {
     var parperSize = paper.view.bounds
     var randomPosition = getRandomPosition()
     var columnWitdh = parperSize.width/(nbcolumn +1)
@@ -59,10 +73,11 @@ function generateCard(isUnity) {
         var order = Math.floor(Math.random()*(7) - 3 ) // unityLevel.value = 3
         if(unityLevel.value == 2) { order = Math.floor(Math.random() * 7) }
         if(unityLevel.value == 1) { order = Math.floor(Math.random() * 4) }
-        new Card(randomPosition.x, randomPosition.y, unities[order.toString()], columnWitdh)
+        new Card(randomPosition.x, randomPosition.y, unities[order.toString()], columnWitdh, isUnity, order)
     } else {
-        new Card(randomPosition.x, randomPosition.y, Math.floor(Math.random()*(Math.pow(10, level.value))), columnWitdh)
+        new Card(randomPosition.x, randomPosition.y, Math.floor(Math.random()*(Math.pow(10, level.value))), columnWitdh, isUnity, null)
     }
+    displayResult(isResultHidden)
 }
 
 function redrawFromStack(delta) {
@@ -71,12 +86,43 @@ function redrawFromStack(delta) {
         var scale = 1
         if(delta == 1) { scale = nbcolumn/(nbcolumn + 1) }
         if(delta == -1) { scale = (nbcolumn + 2)/(nbcolumn + 1) }
-        if(cardStack[cardID]['pos'] <= nbcolumn + 1) {
-            new Card(data.x*scale, data.y, data.value, paper.view.bounds.width/(nbcolumn + 1))
-        }
+        if(cardStack[cardID]['pos'] <= nbcolumn + 1) { new Card(data.x*scale, data.y, data.value, paper.view.bounds.width/(nbcolumn + 1), data.isUnity, data.order) }
         delete(cardStack[cardID])   
     }
 }
+
+function computeNumber() {
+    var computedNumber
+    var sumList = []
+    for(var cardID in cardStack ) {
+        var card = cardStack[cardID]
+        if(card.isUnity) {
+            var checksum = card.pos + parseInt(card.order)
+            if(!(sumList.includes(checksum))) { sumList.push(checksum) }
+        }
+    }
+    var correctUnities = sumList.length == 1
+    if(correctUnities) {
+        computedNumber = 0
+        for(var cardID in cardStack ) {
+            var card = cardStack[cardID]
+            if(!card.isUnity) {
+                computedNumber += card.value*Math.pow(10, sumList[0] - card.pos)
+            }
+        }
+    }
+    return computedNumber
+}
+
+function displayResult(isResultHidden) {
+    var resultDisplayText = 'Caché'
+    if(!isResultHidden) {
+        resultDisplayText = 'Aie !'
+        var computedNumber = Math.round(computeNumber()*100000000)/100000000
+        if(computedNumber) { resultDisplayText = computedNumber.toString().replace('.',',') }
+    }
+    resultDisplay.innerHTML = resultDisplayText
+} 
 
 function ID() { return Math.random().toString(36).substring(2, 9); }
 
@@ -121,23 +167,32 @@ var html =  '<nav class="navbar fixed-top navbar-light bg-light">' +
 
                     '<div class="form-check form-switch">' +
                         '<input id="showNumberSwitch" class="form-check-input" type="checkbox" role="switch" style="transform: scale(1.8);" >' +
-                        '<label class="form-check-label" style="padding-left: 10px;">Cacher/Montrer</label>' +
+                        //'<label class="form-check-label" style="padding-left: 20px;">Cacher</label>' +
                     '</div>' +
 
                     '<div class="d-flex">' +
                         '<input id="numberInput" class="form-control me-2" type="search" data-toggle="tooltip" data-placement="left" title="Entrez un nombre ou une unité de numération (u, c, *d)" >' +
                     '</div>' +
 
+                    '<span class="navbar-text" style="padding-right: 20px;"><h2 id="resultDisplay">Caché</h2></span>'+
+
                     '<div class="form-check form-switch">' +
                         '<input id="showResultSwitch" class="form-check-input" type="checkbox" role="switch" style="transform: scale(1.8);" >' +
-                        '<label class="form-check-label" style="padding-left: 10px;">Voir la réponse</label>' +
+                        //'<label class="form-check-label" style="padding-left: 20px;">Réponse</label>' +
                     '</div>' +
 
                     '<div class="d-flex">' +
-                        '<button class="btn btn-danger" data-toggle="tooltip" data-placement="bottom" title="Tout éffacer" id="trashButton">' +
+                        '<button class="btn btn-danger" data-toggle="tooltip" data-placement="bottom" title="Tout effacer" id="trashButton">' +
                             '<i class="fa-solid fa-trash"></i>' +
                         '</button>' +
                     '</div>' +
+
+                    '<div class="d-flex">' +
+                        '<button class="btn btn-success" data-toggle="tooltip" data-placement="bottom" title="Aide" id="helpButton">' +
+                            '<i class="fa-solid fa-question"></i>' +
+                        '</button>' +
+                    '</div>' +
+                    
                 '</div>' +
             '</nav>'
 
@@ -155,6 +210,10 @@ var level = document.getElementById('level')
 var showNumberSwitch = document.getElementById('showNumberSwitch')
 var showResultSwitch = document.getElementById('showResultSwitch')
 var trashButton = document.getElementById('trashButton')
+var helpButton = document.getElementById('helpButton')
+var resultDisplay = document.getElementById('resultDisplay')
+
+var helpModal = new bootstrap.Modal(document.getElementById('helpModal'), { keyboard: false })
 
 minusButton.onclick = function() {
     nbcolumn--
@@ -176,40 +235,52 @@ numberInput.addEventListener('keyup', function(event) {
         var columnWitdh = paper.view.bounds.width/(nbcolumn +1)
         var currentValue = numberInput.value
         var generate = false
+        var isUnity = false
+        var order = null
 
-        if(currentValue in shortCut) { 
+        if(currentValue in shortCut) {
+            order = shortCutToOrder[currentValue]
             currentValue = shortCut[currentValue]
+            isUnity = true
             generate = true
          } else {
              if(!isNaN(currentValue)) {
                  generate = true
              }
          }
-         if(generate) { new Card(randomPosition.x, randomPosition.y, currentValue, columnWitdh) }
+         if(generate) {
+             new Card(randomPosition.x, randomPosition.y, currentValue, columnWitdh, isUnity, order)
+             displayResult(isResultHidden)
+            }
          numberInput.value = ''
     }
 })
-showResultSwitch.addEventListener('change', function() { console.log('showResultSwitch') })
+showResultSwitch.addEventListener('change', function() {
+    isResultHidden = !isResultHidden
+    displayResult(isResultHidden)
+})
 showNumberSwitch.addEventListener('change', function() { 
     if(!isNumberHidden) { numberInput.setAttribute("type", "password") } else { numberInput.setAttribute("type", "text") }
     isNumberHidden = !isNumberHidden
  })
 
-trashButton.onclick = function() {
+ trashButton.onclick = function() {
     nbcolumn = 3
     cardStack  = {}
     drawApp(paper.view.bounds, nbcolumn, 0)
 }
 
+helpButton.onclick = function() { helpModal.toggle() }
+
 //level.addEventListener('change', function() { console.log(level.value) })
 //function keyup(event) { window.dispatchEvent(new Event('keyup')); }
 //function change(event) { window.dispatchEvent(new Event('change')); }
 
-function drawApp(parperSize, nbcolumn, way) {
+/* main function */
 
+function drawApp(parperSize, nbcolumn, way) {
     project.clear()
     var grid = new Group()
-    
     var columnWitdh = parperSize.width/(nbcolumn + 1)
     for(var j=0; j<nbcolumn +1;j++) {
         var from = new Point(columnWitdh/2 + columnWitdh*j, 0)
@@ -227,14 +298,13 @@ function drawApp(parperSize, nbcolumn, way) {
     grid.addChild(path)
     grid.sendToBack()
     grid.visible = true
-
     redrawFromStack(way)
 }
 
 /* Card */
 var Card = Base.extend({
 
-    initialize: function(x, y, value, columnWitdh) {
+    initialize: function(x, y, value, columnWitdh, isUnity, order) {
 
         var cardWidth = columnWitdh*0.7
         var cardHeight = columnHeight*0.7
@@ -244,11 +314,11 @@ var Card = Base.extend({
         this.value = value
         this.fillColor = pinkColorCard
         this.strokeColor = pinkStrokeColor
-        this.isNumber = true
+        this.isUnity = isUnity
+        this.order = order
         if(isNaN(value)) { 
             this.fillColor = greenColorCard
             this.strokeColor = greenStrokeColor
-            this.isNumber = false
          }
         
         this.path = new Path.Rectangle({
@@ -285,7 +355,8 @@ var Card = Base.extend({
             'y': y,
             'value': value,
             'pos': Math.floor((x - cardWidth/5)/columnWitdh) + 1,
-            'isNumber': this.isNumber
+            'isUnity': this.isUnity,
+            'order': this.order
         }
 
         /* methods */
@@ -309,6 +380,7 @@ var Card = Base.extend({
                     }
              }
              that.cardGroup.shadowColor = null;
+             displayResult(isResultHidden)
         }
 
         this.cardGroup.onMouseDrag = function(event) { 
@@ -331,6 +403,7 @@ var Card = Base.extend({
             delete(cardStack[that.cardID])
             console.log(cardStack)
             that.cardGroup.remove()
+            displayResult(isResultHidden)
         }
 
         return this.cardGroup
