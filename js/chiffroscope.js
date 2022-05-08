@@ -122,7 +122,32 @@ function displayResult(isResultHidden) {
         if(computedNumber) { resultDisplayText = computedNumber.toString().replace('.',',') }
     }
     resultDisplay.innerHTML = resultDisplayText
-} 
+}
+
+function generateCardFromInput() {
+    var randomPosition = getRandomPosition()
+    var columnWitdh = paper.view.bounds.width/(nbcolumn +1)
+    var currentValue = numberInput.value
+    var generate = false
+    var isUnity = false
+    var order = null
+
+    if(currentValue in shortCut) {
+        order = shortCutToOrder[currentValue]
+        currentValue = shortCut[currentValue]
+        isUnity = true
+        generate = true
+     } else {
+         if(!isNaN(currentValue)) {
+             generate = true
+         }
+     }
+     if(generate && currentValue != '') {
+         new Card(randomPosition.x, randomPosition.y, currentValue, columnWitdh, isUnity, order)
+         displayResult(isResultHidden)
+        }
+     numberInput.value = ''
+}
 
 function ID() { return Math.random().toString(36).substring(2, 9); }
 
@@ -229,32 +254,7 @@ plusButton.onclick = function() {
 }
 unityButton.onclick = function() { generateCard(true) }
 numberButton.onclick = function() { generateCard(false) }
-numberInput.addEventListener('keyup', function(event) {
-    if(event.key == 'Enter') {        
-        var randomPosition = getRandomPosition()
-        var columnWitdh = paper.view.bounds.width/(nbcolumn +1)
-        var currentValue = numberInput.value
-        var generate = false
-        var isUnity = false
-        var order = null
-
-        if(currentValue in shortCut) {
-            order = shortCutToOrder[currentValue]
-            currentValue = shortCut[currentValue]
-            isUnity = true
-            generate = true
-         } else {
-             if(!isNaN(currentValue)) {
-                 generate = true
-             }
-         }
-         if(generate) {
-             new Card(randomPosition.x, randomPosition.y, currentValue, columnWitdh, isUnity, order)
-             displayResult(isResultHidden)
-            }
-         numberInput.value = ''
-    }
-})
+numberInput.addEventListener('keyup', function(event) { if(event.key == 'Enter') { generateCardFromInput() } })
 showResultSwitch.addEventListener('change', function() {
     isResultHidden = !isResultHidden
     displayResult(isResultHidden)
@@ -272,9 +272,9 @@ showNumberSwitch.addEventListener('change', function() {
 
 helpButton.onclick = function() { helpModal.toggle() }
 
-//level.addEventListener('change', function() { console.log(level.value) })
-//function keyup(event) { window.dispatchEvent(new Event('keyup')); }
-//function change(event) { window.dispatchEvent(new Event('change')); }
+/* key functions */
+
+function onKeyDown(event) { if (event.key == 'enter') { generateCardFromInput() } }
 
 /* main function */
 

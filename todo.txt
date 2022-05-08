@@ -3,11 +3,6 @@ fix:
 tooltips / popover
 
 
-
-css/js :
-disable plus/minus if bornes atteintes
-
-
 warning:
 
 responsive-paper.css :
@@ -16,7 +11,7 @@ responsive-paper.css :
 
  TODO :
 
-    trig enter NOT focus on input number
+    
     shorcut : 
 
     console.log
@@ -42,6 +37,8 @@ DONE :
  blockmoveTOP
  switch => password & ?(hide)
  13,56 au lieu de 12.67 & erreur arrondi
+ trigger Enter Key when NOT focus on input
 
 NOT :
 random card : pas deux fois la même unité
+12,24 ou 12.24 in input
