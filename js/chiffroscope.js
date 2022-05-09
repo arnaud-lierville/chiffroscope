@@ -115,9 +115,9 @@ function computeNumber() {
 }
 
 function displayResult(isResultHidden) {
-    var resultDisplayText = 'Caché'
+    var resultDisplayText = '?'
     if(!isResultHidden) {
-        resultDisplayText = 'Aie !'
+        resultDisplayText = '!'
         var computedNumber = Math.round(computeNumber()*100000000)/100000000
         if(computedNumber) { resultDisplayText = computedNumber.toString().replace('.',',') }
     }
@@ -199,7 +199,7 @@ var html =  '<nav class="navbar fixed-top navbar-light bg-light">' +
                         '<input id="numberInput" class="form-control me-2" type="search" data-toggle="tooltip" data-placement="left" title="Entrez un nombre ou une unité de numération (u, c, *d)" >' +
                     '</div>' +
 
-                    '<span class="navbar-text" style="padding-right: 20px;"><h2 id="resultDisplay">Caché</h2></span>'+
+                    '<span class="navbar-text" style="padding-right: 20px;"><h2 id="resultDisplay">?</h2></span>'+
 
                     '<div class="form-check form-switch">' +
                         '<input id="showResultSwitch" class="form-check-input" type="checkbox" role="switch" style="transform: scale(1.8);" >' +
