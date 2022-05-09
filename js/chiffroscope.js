@@ -73,9 +73,9 @@ function generateCard(isUnity) {
         var order = Math.floor(Math.random()*(7) - 3 ) // unityLevel.value = 3
         if(unityLevel.value == 2) { order = Math.floor(Math.random() * 7) }
         if(unityLevel.value == 1) { order = Math.floor(Math.random() * 4) }
-        new Card(randomPosition.x, randomPosition.y, unities[order.toString()], columnWitdh, isUnity, order)
+        new Card(randomPosition.x, randomPosition.y, unities[order.toString()], columnWitdh, isUnity, order, isNumberHidden)
     } else {
-        new Card(randomPosition.x, randomPosition.y, Math.floor(Math.random()*(Math.pow(10, level.value))), columnWitdh, isUnity, null)
+        new Card(randomPosition.x, randomPosition.y, Math.floor(Math.random()*(Math.pow(10, level.value))), columnWitdh, isUnity, null, isNumberHidden)
     }
     displayResult(isResultHidden)
 }
@@ -86,7 +86,7 @@ function redrawFromStack(delta) {
         var scale = 1
         if(delta == 1) { scale = nbcolumn/(nbcolumn + 1) }
         if(delta == -1) { scale = (nbcolumn + 2)/(nbcolumn + 1) }
-        if(cardStack[cardID]['pos'] <= nbcolumn + 1) { new Card(data.x*scale, data.y, data.value, paper.view.bounds.width/(nbcolumn + 1), data.isUnity, data.order) }
+        if(cardStack[cardID]['pos'] <= nbcolumn + 1) { new Card(data.x*scale, data.y, data.value, paper.view.bounds.width/(nbcolumn + 1), data.isUnity, data.order, data.cardSide) }
         delete(cardStack[cardID])   
     }
 }
@@ -143,7 +143,7 @@ function generateCardFromInput() {
          }
      }
      if(generate && currentValue != '') {
-         new Card(randomPosition.x, randomPosition.y, currentValue, columnWitdh, isUnity, order)
+         new Card(randomPosition.x, randomPosition.y, currentValue, columnWitdh, isUnity, order, isNumberHidden)
          displayResult(isResultHidden)
         }
      numberInput.value = ''
@@ -304,7 +304,7 @@ function drawApp(parperSize, nbcolumn, way) {
 /* Card */
 var Card = Base.extend({
 
-    initialize: function(x, y, value, columnWitdh, isUnity, order) {
+    initialize: function(x, y, value, columnWitdh, isUnity, order, cardSide) {
 
         var cardWidth = columnWitdh*0.7
         var cardHeight = columnHeight*0.7
@@ -312,6 +312,7 @@ var Card = Base.extend({
         this.x = x
         this.y = y
         this.value = value
+        this.cardSide = cardSide
         this.fillColor = pinkColorCard
         this.strokeColor = pinkStrokeColor
         this.isUnity = isUnity
@@ -338,11 +339,11 @@ var Card = Base.extend({
         
         //scaling the text if too long
         var textWidth = this.text.bounds.width
-        if(isNumberHidden) { this.text.content = '?' }
+        if(cardSide) { this.text.content = '?' }
         var textNumberOfCharacters = value.toString().length
         this.scale = 1
         if(textNumberOfCharacters > cardWidth/(fontSize*0.69)) { this.scale = cardWidth*0.9/textWidth }
-        if(!isNumberHidden) { this.text.scale(this.scale) }
+        if(!cardSide) { this.text.scale(this.scale) }
     
         this.cardGroup = new Group();
         this.cardGroup.addChild(this.path)
@@ -356,7 +357,8 @@ var Card = Base.extend({
             'value': value,
             'pos': Math.floor((x - cardWidth/5)/columnWitdh) + 1,
             'isUnity': this.isUnity,
-            'order': this.order
+            'order': this.order,
+            'cardSide' : this.cardSide
         }
 
         /* methods */
@@ -370,14 +372,17 @@ var Card = Base.extend({
         }
 
         this.cardGroup.onMouseUp = function(event) {
-            if(!wasMoving) { 
+            if(!wasMoving) {
                 if (that.text.content == '?') { 
                     that.text.content = value
                     that.text.scale(that.scale)
-                 } else { 
+                } else { 
                      that.text.content = '?'
                      that.text.scale(1/that.scale)
+                     cardStack[that.cardID].cardSide = !that.cardSide
                     }
+                that.cardSide = !that.cardSide
+                cardStack[that.cardID].cardSide = that.cardSide
              }
              that.cardGroup.shadowColor = null;
              displayResult(isResultHidden)
