@@ -73,9 +73,9 @@ function generateCard(isUnity) {
         var order = Math.floor(Math.random()*(7) - 3 ) // unityLevel.value = 3
         if(unityLevel.value == 2) { order = Math.floor(Math.random() * 7) }
         if(unityLevel.value == 1) { order = Math.floor(Math.random() * 4) }
-        new Card(randomPosition.x, randomPosition.y, unities[order.toString()], columnWitdh, isUnity, order, isNumberHidden)
+        new Card(randomPosition.x, randomPosition.y, unities[order.toString()], columnWitdh, isUnity, order, isNumberHidden, true)
     } else {
-        new Card(randomPosition.x, randomPosition.y, Math.floor(Math.random()*(Math.pow(10, level.value))), columnWitdh, isUnity, null, isNumberHidden)
+        new Card(randomPosition.x, randomPosition.y, Math.floor(Math.random()*(Math.pow(10, level.value))), columnWitdh, isUnity, null, isNumberHidden, true)
     }
     displayResult(isResultHidden)
 }
@@ -86,7 +86,11 @@ function redrawFromStack(delta) {
         var scale = 1
         if(delta == 1) { scale = nbcolumn/(nbcolumn + 1) }
         if(delta == -1) { scale = (nbcolumn + 2)/(nbcolumn + 1) }
-        if(cardStack[cardID]['pos'] <= nbcolumn + 1) { new Card(data.x*scale, data.y, data.value, paper.view.bounds.width/(nbcolumn + 1), data.isUnity, data.order, data.cardSide) }
+        if(cardStack[cardID]['pos'] <= nbcolumn + 1 ) {
+            new Card(data.x*scale, data.y, data.value, paper.view.bounds.width/(nbcolumn + 1), data.isUnity, data.order, data.cardSide, true)
+        } else {
+            new Card(data.x*scale, data.y, data.value, paper.view.bounds.width/(nbcolumn + 1), data.isUnity, data.order, data.cardSide, false)
+        }
         delete(cardStack[cardID])
         displayResult(isResultHidden)
     }
@@ -97,7 +101,7 @@ function computeNumber() {
     var sumList = []
     for(var cardID in cardStack ) {
         var card = cardStack[cardID]
-        if(card.isUnity) {
+        if(card.isUnity && card.isOnBoard) {
             var checksum = card.pos + parseInt(card.order)
             if(!(sumList.includes(checksum))) { sumList.push(checksum) }
         }
@@ -105,9 +109,9 @@ function computeNumber() {
     var correctUnities = sumList.length == 1
     if(correctUnities) {
         computedNumber = 0
-        for(var cardID in cardStack ) {
+        for(var cardID in cardStack) {
             var card = cardStack[cardID]
-            if(!card.isUnity) {
+            if(!card.isUnity && card.isOnBoard) {
                 computedNumber += card.value*Math.pow(10, sumList[0] - card.pos)
             }
         }
@@ -144,7 +148,7 @@ function generateCardFromInput() {
          }
      }
      if(generate && currentValue != '') {
-         new Card(randomPosition.x, randomPosition.y, currentValue, columnWitdh, isUnity, order, isNumberHidden)
+         new Card(randomPosition.x, randomPosition.y, currentValue, columnWitdh, isUnity, order, isNumberHidden, true)
          displayResult(isResultHidden)
         }
      numberInput.value = ''
@@ -285,6 +289,7 @@ showNumberSwitch.addEventListener('change', function() {
     nbcolumn = 3
     cardStack  = {}
     drawApp(paper.view.bounds, nbcolumn, 0)
+    displayResult(isResultHidden)
 }
 
 helpButton.onclick = function() { helpModal.toggle() }
@@ -321,7 +326,7 @@ function drawApp(parperSize, nbcolumn, way) {
 /* Card */
 var Card = Base.extend({
 
-    initialize: function(x, y, value, columnWitdh, isUnity, order, cardSide) {
+    initialize: function(x, y, value, columnWitdh, isUnity, order, cardSide, isOnBoard) {
 
         var cardWidth = columnWitdh*0.7
         var cardHeight = columnHeight*0.7
@@ -330,6 +335,7 @@ var Card = Base.extend({
         this.y = y
         this.value = value
         this.cardSide = cardSide
+        this.isOnBoard = isOnBoard
         this.fillColor = pinkColorCard
         this.strokeColor = pinkStrokeColor
         this.isUnity = isUnity
@@ -375,7 +381,8 @@ var Card = Base.extend({
             'pos': Math.floor((x - cardWidth/5)/columnWitdh) + 1,
             'isUnity': this.isUnity,
             'order': this.order,
-            'cardSide' : this.cardSide
+            'cardSide': this.cardSide,
+            'isOnBoard': this.isOnBoard
         }
 
         /* methods */
