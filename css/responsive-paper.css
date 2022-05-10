@@ -32,3 +32,7 @@ canvas[resize] {
 .custom-switch {
     margin: 7px 5px 7px 10px;
 }
+
+.li-rules {
+    padding-bottom: 7px;
+}
