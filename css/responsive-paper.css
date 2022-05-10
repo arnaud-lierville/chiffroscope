@@ -24,3 +24,11 @@ canvas[resize] {
 .navbar-light .navbar-text {
     color: #E30B63;
 }
+
+.nav-item {
+    margin: 3px 10px 3px 3px;
+}
+
+.custom-switch {
+    margin: 7px 5px 7px 10px;
+}

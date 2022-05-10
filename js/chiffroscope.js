@@ -155,71 +155,87 @@ function ID() { return Math.random().toString(36).substring(2, 9); }
 paper.view.onResize = function() { drawApp(paper.view.bounds, nbcolumn, 0) }
 
 /* Html scene */
-var html =  '<nav class="navbar fixed-top navbar-light bg-light">' +
-                '<div class="container-fluid">' +
-                    '<a class="navbar-brand" href="https://chiffroscope.blogs.laclasse.com" target="_blank">Chiffroscope</a>' +
+var html =  '<nav class="navbar fixed-bottom navbar-light bg-light">' +
+                '<div class="container-fluid justify-content-center">' +
 
-                    '<div class="btn-group">' +
-                        '<button class="btn btn-outline-info" data-toggle="tooltip" data-placement="bottom" title="Moins de colonnes" id="minusButton">' +
-                            '<i class="fa-solid fa-minus"></i>' +
-                        '</button>' +
-                        '<button class="btn btn-outline-success" data-toggle="tooltip" data-placement="bottom" title="Tirage au hasard d\'une unité de numération" id="unityButton">' +
-                            '<i class="fa-solid fa-coins"></i>' +
-                        '</button>' +
-                        '<button class="btn btn-outline-success" data-toggle="tooltip" data-placement="bottom" title="Tirage au hasard d\'un nombre" id="numberButton">' +
-                            '<i class="fa-solid fa-hand-sparkles"></i>' +
-                        '</button>' +
-                        '<button class="btn btn-outline-danger" data-toggle="tooltip" data-placement="bottom" title="Plus de colonnes" id="plusButton">' +
-                            '<i class="fa-solid fa-plus"></i>' +
-                        '</button>' +
-                    '</div>' +
-
-                    '<div class="d-flex">' +
-                        '<select class="form-select" id="unityLevel">' +
-                            '<option value="1" selected>Jusqu\'au milliers</option>' +
-                            '<option value="2">Jusqu\'au millions</option>' +
-                            '<option value="3">Décimaux</option>' +
-                            '</select>' +
-                    '</div>' +
-
-                    '<div class="d-flex">' +
-                        '<select class="form-select" id="level">' +
-                            '<option value="1" selected>Jusqu\'à 9</option>' +
-                            '<option value="2">Jusqu\'à 99</option>' +
-                            '<option value="3">Jusqu\'à 999</option>' +
-                            '</select>' +
-                    '</div>' +
-
-                    '<div class="form-check form-switch">' +
-                        '<input id="showNumberSwitch" class="form-check-input" type="checkbox" role="switch" style="transform: scale(1.8);" >' +
-                        //'<label class="form-check-label" style="padding-left: 20px;">Cacher</label>' +
-                    '</div>' +
-
-                    '<div class="d-flex">' +
-                        '<input id="numberInput" class="form-control me-2" type="search" data-toggle="tooltip" data-placement="left" title="Entrez un nombre ou une unité de numération (u, c, *d)" >' +
-                    '</div>' +
-
-                    '<span class="navbar-text" style="padding-right: 20px;"><h2 id="resultDisplay">?</h2></span>'+
-
-                    '<div class="form-check form-switch">' +
-                        '<input id="showResultSwitch" class="form-check-input" type="checkbox" role="switch" style="transform: scale(1.8);" >' +
-                        //'<label class="form-check-label" style="padding-left: 20px;">Réponse</label>' +
-                    '</div>' +
-
-                    '<div class="d-flex">' +
-                        '<button class="btn btn-danger" data-toggle="tooltip" data-placement="bottom" title="Tout effacer" id="trashButton">' +
-                            '<i class="fa-solid fa-trash"></i>' +
-                        '</button>' +
-                    '</div>' +
-
-                    '<div class="d-flex">' +
-                        '<button class="btn btn-success" data-toggle="tooltip" data-placement="bottom" title="Aide" id="helpButton">' +
-                            '<i class="fa-solid fa-question"></i>' +
-                        '</button>' +
-                    '</div>' +
+                    '<span class="navbar-text"><h1 id="resultDisplay">?</h1></span>' +
                     
                 '</div>' +
-            '</nav>'
+            '</nav>' +
+            '<nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">' +
+			'<div class="container-fluid">' +
+			  '<a class="navbar-brand" href="https://chiffroscope.blogs.laclasse.com" target="_blank">Chiffroscope</a>' +
+			  '<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">' +
+				'<span class="navbar-toggler-icon"></span>' +
+			  '</button>' +
+			  '<div class="collapse navbar-collapse" id="navbarNav">' +
+				'<ul class="navbar-nav">' +
+
+					'<li class="nav-item">' +
+						'<div class="btn-group">' +
+							'<button class="btn btn-outline-info" data-toggle="tooltip" data-placement="bottom" title="Moins de colonnes" id="minusButton">' +
+									'<i class="fa-solid fa-minus"></i>' +
+							'</button>' +
+							'<button class="btn btn-outline-success" data-toggle="tooltip" data-placement="bottom" title="Tirage au hasard d\'une unité de numération" id="unityButton">' +
+								'<i class="fa-solid fa-coins"></i>' +
+							'</button>' +
+							'<button class="btn btn-outline-success" data-toggle="tooltip" data-placement="bottom" title="Tirage au hasard d\'un nombre" id="numberButton">' +
+								'<i class="fa-solid fa-hand-sparkles"></i>' +
+							'</button>' +
+							'<button class="btn btn-outline-danger" data-toggle="tooltip" data-placement="bottom" title="Plus de colonnes" id="plusButton">' +
+								'<i class="fa-solid fa-plus"></i>' +
+							'</button>' +
+						'</div>' +
+					'</li>' +
+
+					'<li class="nav-item">' +
+						'<div class="form-check form-switch custom-switch" data-toggle="tooltip" data-placement="bottom" title="La carte générée est retournée">' +
+							'<input id="showNumberSwitch" class="form-check-input" type="checkbox" role="switch" style="transform: scale(1.8);">' +
+							'<label class="form-check-label" style="padding-left: 20px;">Carte retournée</label>' +
+						'</div>' +
+					'</li>' +
+
+					'<li class="nav-item">' +
+						'<select class="form-select" id="unityLevel">' +
+							'<option value="1" selected>Jusqu\'au milliers</option>' +
+							'<option value="2">Jusqu\'au millions</option>' +
+							'<option value="3">Décimaux</option>' +
+						'</select>' +
+					'</li>' +
+
+					'<li class="nav-item">' +
+						'<select class="form-select" id="level">' +
+							'<option value="1" selected>Jusqu\'à 9</option>' +
+							'<option value="2">Jusqu\'à 99</option>' +
+							'<option value="3">Jusqu\'à 999</option>' +
+						'</select>' +
+					'</li>' +
+
+					'<li class="nav-item">' +
+						'<input id="numberInput" class="form-control me-2" type="search" data-toggle="tooltip" data-placement="left" title="Entrez un nombre ou une unité de numération (u, c, *d)" >' +
+					'</li>' +
+
+					'<li class="nav-item">' +
+						'<div class="btn-group">' +
+							'<button class="btn btn-danger" data-toggle="tooltip" data-placement="bottom" title="Tout effacer" id="trashButton">' +
+								'<i class="fa-solid fa-trash"></i>' +
+							'</button>' +
+							'<button class="btn btn-success" data-toggle="tooltip" data-placement="bottom" title="Aide" id="helpButton">' +
+								'<i class="fa-solid fa-question"></i>' +
+							'</button>' +
+						'</div>' +
+					'</li>' +
+
+					'<li class="nav-item">' +
+						'<div class="form-check form-switch custom-switch" data-placement="bottom" title="Afficher le nombre codé">' +
+							'<input id="showResultSwitch" class="form-check-input" type="checkbox" role="switch" style="transform: scale(1.8);">' +
+							'<label class="form-check-label" style="padding-left: 20px;">Afficher le nombre codé</label>' +
+						'</div>' +
+					'</li>' +
+
+				'</ul>' +
+			'</div>' +
+		  '</nav>'
 
 var div = document.createElement('div')
 div.innerHTML = html
