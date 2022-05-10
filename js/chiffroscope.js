@@ -87,7 +87,8 @@ function redrawFromStack(delta) {
         if(delta == 1) { scale = nbcolumn/(nbcolumn + 1) }
         if(delta == -1) { scale = (nbcolumn + 2)/(nbcolumn + 1) }
         if(cardStack[cardID]['pos'] <= nbcolumn + 1) { new Card(data.x*scale, data.y, data.value, paper.view.bounds.width/(nbcolumn + 1), data.isUnity, data.order, data.cardSide) }
-        delete(cardStack[cardID])   
+        delete(cardStack[cardID])
+        displayResult(isResultHidden)
     }
 }
 
@@ -418,6 +419,7 @@ var Card = Base.extend({
             cardStack[that.cardID]['y'] = Math.max(cardStack[that.cardID]['y'] + event.delta.y, marginNavbar)
             cardStack[that.cardID]['pos'] = Math.floor((cardStack[that.cardID]['x'] - cardWidth/5)/columnWitdh) + 1
             wasMoving = true
+            displayResult(isResultHidden)
         }
 
         this.cardGroup.onDoubleClick = function(event) {
