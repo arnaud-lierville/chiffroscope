@@ -1,13 +1,9 @@
 TODO :
-console.log
-confusion 2 switch (changer de couleur)
 fix : tooltips bootstrap
-push online
+push online + README
 
 TODO+ :
-random card : pas deux fois la même unité
 12,24 ou 12.24 in input
-pas AIE ! si pas nombre
 shorcuts p plus de colonnes, m moins de colonnes, u génération d'une carte unité, n génération d'une carte nombre
 
 WARNING :
